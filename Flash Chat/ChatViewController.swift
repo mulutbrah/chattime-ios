@@ -13,6 +13,7 @@ import Firebase
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     
     // Declare instance variables here
+    var messageArray : [Message] = [Message]()
 
     
     // We've pre-linked the IBOutlets
@@ -25,6 +26,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        retrieveMessages()
         
         //TODO: Set yourself as the delegate and datasource here:
         messageTableView.delegate = self
@@ -58,7 +61,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
 //    how many rowsection you want?
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return 3
+        return messageArray.count
         
     }
     
@@ -67,10 +70,10 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
         
-        let messageArray = ["First Message", "Second Message", "Third Message"]
+        cell.messageBody.text = messageArray[indexPath.row].messageBody
+        cell.senderUsername.text = messageArray[indexPath.row].sender
+        cell.avatarImageView.image = UIImage(named: "egg")
         
-        cell.messageBody.text = messageArray[indexPath.row]
-     
         return cell
     }
     
@@ -157,6 +160,36 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     //TODO: Create the retrieveMessages method here:
+    func retrieveMessages() {
+        
+        let db = Firestore.firestore()
+        
+        db.collection("messages").addSnapshotListener { querySnapshot, error in
+           guard let snapshot = querySnapshot else {
+               print("Error fetching snapshots: \(error!)")
+               return
+           }
+           snapshot.documentChanges.forEach { diff in
+                if (diff.type == .added) {
+                    let newMessage = Message()
+                    newMessage.messageBody = diff.document.data()["MessageBody"]! as! String
+                    newMessage.sender    = diff.document.data()["Sender"]! as! String
+                    
+                    self.messageArray.append(newMessage)
+                    self.configureTableView()
+                    self.messageTableView.reloadData()
+                }
+                if (diff.type == .modified) {
+                   print("Modified city: \(diff.document.data())")
+                }
+                if (diff.type == .removed) {
+                   print("Removed city: \(diff.document.data())")
+                }
+           }
+        }
+
+        
+    }
     
     
 
