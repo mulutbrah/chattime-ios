@@ -144,8 +144,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         let messageDictionary = ["Sender": Auth.auth().currentUser?.email, "MessageBody": messageTextfield.text!]
         
-        var ref: DocumentReference? = nil
-        ref = messagesDB.addDocument(data: messageDictionary as [String : Any]) { err in
+        messagesDB.addDocument(data: messageDictionary as [String : Any]) { err in
             if let err = err {
                 print("Error adding document: \(err)")
             } else {
