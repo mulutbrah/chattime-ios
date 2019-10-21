@@ -149,8 +149,6 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
             if let err = err {
                 print("Error adding document: \(err)")
             } else {
-                print("Document added with ID: \(ref!.documentID)")
-                
                 self.messageTextfield.isEnabled = true
                 self.sendButton.isEnabled = true
                 self.messageTextfield.text = ""
