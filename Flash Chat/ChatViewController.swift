@@ -8,7 +8,7 @@
 
 import UIKit
 import Firebase
-
+import SVProgressHUD
 
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     
@@ -133,6 +133,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @IBAction func sendPressed(_ sender: AnyObject) {
         
+        SVProgressHUD.show()
+        
         //TODO: Send the message to Firebase and save it in our database
         messageTextfield.endEditing(true)
         
@@ -146,8 +148,12 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         messagesDB.addDocument(data: messageDictionary as [String : Any]) { err in
             if let err = err {
+                SVProgressHUD.dismiss()
                 print("Error adding document: \(err)")
             } else {
+                
+                SVProgressHUD.dismiss()
+                
                 self.messageTextfield.isEnabled = true
                 self.sendButton.isEnabled = true
                 self.messageTextfield.text = ""
